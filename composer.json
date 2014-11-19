@@ -1,0 +1,22 @@
+{
+    "name": "chewcode/azure-live-streaming-laravel",
+    "type": "library",
+    "description": "PHP wrapper for Preview/Pre-repease Azure Media Services live streaming api methods.",
+    "keywords": ["REST", "RESTFUL", "API"],
+    "homepage": "http://chew.tv",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ben Bowler",
+            "email": "ben@chew.tv"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "autoload": {
+        "classmap": [
+            "src/AzureLive/Laravel"
+        ]
+    }
+}
