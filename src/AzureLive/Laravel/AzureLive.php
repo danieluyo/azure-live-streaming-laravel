@@ -18,10 +18,6 @@ use Guzzle\Stream;
  */
 class AzureLive {
 
-    // public function test() {
-    //     dd('testhgh');
-    // }
-
     /**
      * @var
      */
@@ -30,7 +26,22 @@ class AzureLive {
     /**
      * @var
      */
+    private $client;
+
+    /**
+     * @var
+     */
+    private $base_url;
+
+    /**
+     * @var
+     */
     private $token;
+
+    /**
+     * @var
+     */
+    private $request;
 
     /**
      * @param ServicesBuilder $servicesBuilder
@@ -39,6 +50,14 @@ class AzureLive {
     public function __construct() {
         // $this->servicesBuilder = $sb;
         // $this->config          = $config;
+
+        // $this->base_url = 'https://wamsdubclus001rest-hs.cloudapp.net'; // @todo: might need to get this dynamically??????
+        $this->base_url = 'https://wamsdubclus001rest-hs.cloudapp.net';
+        // $this->base_url = 'https://media.windows.net'; 
+
+        // @todo: might need to get this dynamically??????
+        // Can be found in array(11) { ["odata.metadata"] "https://wamsdubclus001rest-hs.cloudapp.net/api/$metadata#Channels/@Element"
+        // On most requests
 
         # Yes, the Azure SDK wants and environment variable. There is another way, but
         # I am just too lazy to figure it out at the moment.
@@ -55,11 +74,11 @@ class AzureLive {
         // $this->cssm =  "SubscriptionID=".getenv("AZURE_SUBSCRIPTION_ID").";CertificatePath=".getenv("AZURE_PATH_TO_CERTIFICATE");
 
         // Connect...
-        $client = new \Guzzle\Http\Client();
+        $this->client = new \Guzzle\Http\Client();
         // Get results:
 
         // @todo: this url should be dynamic?????
-        $request = $client->post('https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13'); // https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13
+        $request = $this->client->post('https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13'); // https://wamsprodglobal001acs.accesscontrol.windows.net/v2/OAuth2-13
         $request->addHeader('x-ms-version', '2.7');
         $request->addHeader('Content-Type', 'application/x-www-form-urlencoded');
         $request->setBody('grant_type=client_credentials&client_id='.getenv('AZURE_ACCOUNT_NAME').'&client_secret='.urlencode( getenv('AZURE_PRIMARY_MEDIA_SERVICE_ACCESS_KEY') ).'&scope=urn%3aWindowsAzureMediaServices');
@@ -107,54 +126,316 @@ class AzureLive {
 
     ///////// Media Services Live Streaming Functions
 
-    
-    /**
-     * CreateChannels
-     */
-    public function CreateChannel() {
+    private function setRequestHeaders() {
+    	$this->request->addHeader('x-ms-version', '2.7');
+        $this->request->addHeader('Accept', 'application/json;odata=minimalmetadata');
+        $this->request->addHeader('Content-Type', 'application/json;odata=minimalmetadata');
+        $this->request->addHeader('Authorization', 'Bearer '.$this->token);
+    }
 
+    /**
+     * CreateChannel
+     *
+     * @param $name Name
+     * @param $description Description
+     */
+    public function createChannel($name, $description) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Channels');
+
+        $this->setRequestHeaders();
+
+        $this->request->setBody('
+			{
+			    "Id": null,
+			    "Name": "'.$name.'",
+			    "Description": "'.$description.'",
+			    "Created": "0001-01-01T00:00:00",
+			    "LastModified": "0001-01-01T00:00:00",
+			    "State": null,
+			    "Input": {
+			        "KeyFrameInterval": null,
+			        "StreamingProtocol": "RTMP",
+			        "AccessControl": {
+			            "IP": {
+			                "Allow": [{
+			                    "Name": "defaultOpen",
+			                    "Address": "0.0.0.0",
+			                    "SubnetPrefixLength": 0
+			                }]
+			            }
+			        },
+			        "Endpoints": []
+			    },
+			    "Preview": {
+			        "AccessControl": {
+			            "IP": {
+			                "Allow": [{
+			                    "Name": "defaultOpen",
+			                    "Address": "0.0.0.0",
+			                    "SubnetPrefixLength": 0
+			                }]
+			            }
+			        },
+			        "Endpoints": []
+			    },
+			    "Output": {
+			        "Hls": {
+			            "FragmentsPerSegment": 1
+			        }
+			    },
+			    "CrossSiteAccessPolicies": {
+			        "ClientAccessPolicy": null,
+			        "CrossDomainPolicy": null
+			    }
+			}
+        ');
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        	}
+            return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+
+        // if($response->getStatusCode() == 202) { // Success...
+        	// return $response->json();
+        // } else {
+        // 	return 
+        // }
     }
     
     /**
-     * StartChannels
+     * StartChannel
+     *
+     * @param $id Azure Channel Id
      */
-    public function StartChannels() {
+    public function startChannel($id) {
 
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Start');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
     }
     
     /**
-     * StopChannels
+     * StopChannel
+     *
+     * @param $id Azure Channel Id
      */
-    public function StopChannels() {
+    public function stopChannel($id) {
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Stop');
 
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    /**
+     * GetChannel
+     *
+     * @param $id Azure Channel Id
+     */
+    public function getChannel($id) {
+
+        $this->request = $this->client->get($this->base_url.'/api/Channels(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
     }
     
     /**
      * ListChannels
      */
-    public function ListChannels() {
+    public function listChannels() {
+        $this->request = $this->client->get($this->base_url.'/api/Channels');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * ResetChannel
+     *
+     * @param $id Azure Channel Id
+     */
+    public function resetChannel($id) {
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Reset');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * UpdateChannel
+     *
+     * @param $name Name
+     * @param $description Description
+     *
+     * @todo 400 errors atm
+     */
+    public function updateChannel($id, $name = false, $description = false) {
+
+    	// 400 error?
+
+    //     $this->request = $this->client->patch($this->base_url.'/api/Channels(\''.$id.'\')');
+
+    //     $this->setRequestHeaders();
+
+    //     if($name) {
+	   //      $this->request->setBody('
+				// "Name": "'.$name.'"
+	   //      ');
+    //     }
+
+    // //     if($description) {
+	   // //      $this->request->setBody('
+				// // "Description": "'.$description.'"
+	   // //      ');
+	   // //  }
+
+    //     try {
+    //         // $response = $this->request->send();
+
+    //     	$response = $this->request->send();
+
+    //     	if($response->getStatusCode() == 202) {
+    //     	}
+    //         return $response->json();
+
+    //         // $response_array = $response->json();
+    //     } catch (Exception $e) {
+    //     	// Handle??
+    //        return $e; 
+    //     }
 
     }
     
     /**
-     * ResetChannels
+     * DeleteChannel
+     *
+     * @param $id Azure Channel Id
      */
-    public function ResetChannels() {
+    public function deleteChannel($id) {
+        $this->request = $this->client->delete($this->base_url.'/api/Channels(\''.$id.'\')');
 
-    }
-    
-    /**
-     * UpdateChannels
-     */
-    public function UpdateChannels() {
+        $this->setRequestHeaders();
 
-    }
-    
-    /**
-     * DeleteChannels
-     */
-    public function DeleteChannels() {
+        try {
+            // $response = $this->request->send();
 
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
     }
 
 
@@ -166,7 +447,7 @@ class AzureLive {
      */
     public static function fullTest()
     {
-
+// dd('fulltest');
         // Connect...
         $client = new \Guzzle\Http\Client();
         // Get results:
@@ -211,11 +492,6 @@ class AzureLive {
 
         // dd( $token );
 
-
-
-
-
-
         $request = $client->post('https://wamsdubclus001rest-hs.cloudapp.net/api/Channels');
 
         // Moved here atm...
@@ -226,7 +502,7 @@ class AzureLive {
         $request->setBody('
 {
     "Id": null,
-    "Name": "testchannelRTMP",
+    "Name": "testchannel'.time().'",
     "Description": "Test Description",
     "Created": "0001-01-01T00:00:00",
     "LastModified": "0001-01-01T00:00:00",
@@ -237,9 +513,9 @@ class AzureLive {
         "AccessControl": {
             "IP": {
                 "Allow": [{
-                    "Name": "testName1",
-                    "Address": "1.1.1.1",
-                    "SubnetPrefixLength": 24
+                    "Name": "defaultOpen",
+                    "Address": "0.0.0.0",
+                    "SubnetPrefixLength": 0
                 }]
             }
         },
@@ -249,9 +525,9 @@ class AzureLive {
         "AccessControl": {
             "IP": {
                 "Allow": [{
-                    "Name": "testName1",
-                    "Address": "1.1.1.1",
-                    "SubnetPrefixLength": 24
+                    "Name": "defaultOpen",
+                    "Address": "0.0.0.0",
+                    "SubnetPrefixLength": 0
                 }]
             }
         },
