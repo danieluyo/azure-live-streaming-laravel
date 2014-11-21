@@ -218,9 +218,9 @@ class AzureLive {
      *
      * @param $id Azure Channel Id
      */
-    public function startChannel($id) {
+    public function startChannel($channelid) {
 
-        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Start');
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$channelid.'\')/Start');
 
         $this->setRequestHeaders();
 
@@ -247,10 +247,10 @@ class AzureLive {
     /**
      * StopChannel
      *
-     * @param $id Azure Channel Id
+     * @param $channelid Azure Channel Id
      */
-    public function stopChannel($id) {
-        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Stop');
+    public function stopChannel($channelid) {
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$channelid.'\')/Stop');
 
         $this->setRequestHeaders();
 
@@ -277,11 +277,11 @@ class AzureLive {
     /**
      * GetChannel
      *
-     * @param $id Azure Channel Id
+     * @param $channelid Azure Channel Id
      */
-    public function getChannel($id) {
+    public function getChannel($channelid) {
 
-        $this->request = $this->client->get($this->base_url.'/api/Channels(\''.$id.'\')');
+        $this->request = $this->client->get($this->base_url.'/api/Channels(\''.$channelid.'\')');
 
         $this->setRequestHeaders();
 
@@ -336,10 +336,10 @@ class AzureLive {
     /**
      * ResetChannel
      *
-     * @param $id Azure Channel Id
+     * @param $channelid Azure Channel Id
      */
-    public function resetChannel($id) {
-        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$id.'\')/Reset');
+    public function resetChannel($channelid) {
+        $this->request = $this->client->post($this->base_url.'/api/Channels(\''.$channelid.'\')/Reset');
 
         $this->setRequestHeaders();
 
@@ -371,13 +371,13 @@ class AzureLive {
      *
      * @todo 400 errors atm
      */
-    public function updateChannel($id, $name = false, $description = false) {
+    public function updateChannel($channelid, $name = false, $description = false) {
 
     	// 400 error?
 
-    //     $this->request = $this->client->patch($this->base_url.'/api/Channels(\''.$id.'\')');
+        // $this->request = $this->client->patch($this->base_url.'/api/Channels(\''.$channelid.'\')');
 
-    //     $this->setRequestHeaders();
+        // $this->setRequestHeaders();
 
     //     if($name) {
 	   //      $this->request->setBody('
@@ -385,36 +385,38 @@ class AzureLive {
 	   //      ');
     //     }
 
-    // //     if($description) {
-	   // //      $this->request->setBody('
-				// // "Description": "'.$description.'"
-	   // //      ');
-	   // //  }
+    //     if($description) {
+	   //      $this->request->setBody('
+				// "Description": "'.$description.'"
+	   //      ');
+	   //  }
 
-    //     try {
-    //         // $response = $this->request->send();
+        // $this->request->setBody(' "Output":{"Hls":{"FragmentsPerSegment":2}} ');
 
-    //     	$response = $this->request->send();
+        // try {
+        //     // $response = $this->request->send();
 
-    //     	if($response->getStatusCode() == 202) {
-    //     	}
-    //         return $response->json();
+        // 	$response = $this->request->send();
 
-    //         // $response_array = $response->json();
-    //     } catch (Exception $e) {
-    //     	// Handle??
-    //        return $e; 
-    //     }
+        // 	if($response->getStatusCode() == 202) {
+        // 	}
+        //     return $response->json();
+
+        //     // $response_array = $response->json();
+        // } catch (Exception $e) {
+        // 	// Handle??
+        //    return $e; 
+        // }
 
     }
     
     /**
      * DeleteChannel
      *
-     * @param $id Azure Channel Id
+     * @param $channelid Azure Channel Id
      */
-    public function deleteChannel($id) {
-        $this->request = $this->client->delete($this->base_url.'/api/Channels(\''.$id.'\')');
+    public function deleteChannel($channelid) {
+        $this->request = $this->client->delete($this->base_url.'/api/Channels(\''.$channelid.'\')');
 
         $this->setRequestHeaders();
 
@@ -439,6 +441,257 @@ class AzureLive {
     }
 
 
+    /**
+     * Program
+     */
+
+
+    /**
+     * CreateProgram
+     *
+     * @param $name Name
+     * @param $description Description
+     */
+    public function createProgram($channelid, $name, $description) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Programs');
+
+        $this->setRequestHeaders();
+
+        $this->request->setBody('
+            {
+                "Id": null,
+                "Name": "'.$name.'",
+                "Description": "'.$description.'",
+                "Created": "0001-01-01T00:00:00",
+                "LastModified": "0001-01-01T00:00:00",
+                "ChannelId": "nb:chid:UUID:83bb19de-7abf-4907-9578-abe90adfbabe",
+                "AssetId": "nb:cid:UUID:bc495364-5357-42a1-9a9d-be54689cfae2",
+                "ArchiveWindowLength": "PT1H",
+                "State": null,
+                "ManifestName": null
+            }
+        ');
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        	}
+            return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+
+        // if($response->getStatusCode() == 202) { // Success...
+        	// return $response->json();
+        // } else {
+        // 	return 
+        // }
+    }
+    
+    /**
+     * StartProgram
+     *
+     * @param $id Azure Program Id
+     */
+    public function startProgram($id) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Programs(\''.$id.'\')/Start');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * StopProgram
+     *
+     * @param $id Azure Program Id
+     */
+    public function stopProgram($id) {
+        $this->request = $this->client->post($this->base_url.'/api/Programs(\''.$id.'\')/Stop');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    /**
+     * GetProgram
+     *
+     * @param $id Azure Program Id
+     */
+    public function getProgram($id) {
+
+        $this->request = $this->client->get($this->base_url.'/api/Programs(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * ListPrograms
+     */
+    public function listPrograms() {
+        $this->request = $this->client->get($this->base_url.'/api/Programs');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    
+    /**
+     * UpdateProgram
+     *
+     * @param $name Name
+     * @param $description Description
+     *
+     * @todo 400 errors atm
+     */
+    public function updateProgram($id, $name = false, $description = false) {
+
+    	// 400 error?
+
+        // $this->request = $this->client->patch($this->base_url.'/api/Programs(\''.$id.'\')');
+
+        // $this->setRequestHeaders();
+
+    //     if($name) {
+	   //      $this->request->setBody('
+				// "Name": "'.$name.'"
+	   //      ');
+    //     }
+
+    //     if($description) {
+	   //      $this->request->setBody('
+				// "Description": "'.$description.'"
+	   //      ');
+	   //  }
+
+        // $this->request->setBody(' "Output":{"Hls":{"FragmentsPerSegment":2}} ');
+
+        // try {
+        //     // $response = $this->request->send();
+
+        // 	$response = $this->request->send();
+
+        // 	if($response->getStatusCode() == 202) {
+        // 	}
+        //     return $response->json();
+
+        //     // $response_array = $response->json();
+        // } catch (Exception $e) {
+        // 	// Handle??
+        //    return $e; 
+        // }
+
+    }
+    
+    /**
+     * DeleteProgram
+     *
+     * @param $id Azure Program Id
+     */
+    public function deleteProgram($id) {
+        $this->request = $this->client->delete($this->base_url.'/api/Programs(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
 
 
 
