@@ -461,6 +461,7 @@ class AzureLive {
 
         $this->setRequestHeaders();
 
+
         $this->request->setBody('
             {
                 "Id": null,
@@ -751,67 +752,6 @@ class AzureLive {
     }
     
     /**
-     * StartAsset
-     *
-     * @param $id Azure Asset Id
-     */
-    public function startAsset($id) {
-
-        $this->request = $this->client->post($this->base_url.'/api/Assets(\''.$id.'\')/Start');
-
-        $this->setRequestHeaders();
-
-        try {
-            // $response = $this->request->send();
-
-        	$response = $this->request->send();
-
-        	if($response->getStatusCode() == 202) {
-        		return true;
-        	} else {
-        		return false;
-
-        	}
-            // return $response->json();
-
-            // $response_array = $response->json();
-        } catch (Exception $e) {
-        	// Handle??
-           return $e; 
-        }
-    }
-    
-    /**
-     * StopAsset
-     *
-     * @param $id Azure Asset Id
-     */
-    public function stopAsset($id) {
-        $this->request = $this->client->post($this->base_url.'/api/Assets(\''.$id.'\')/Stop');
-
-        $this->setRequestHeaders();
-
-        try {
-            // $response = $this->request->send();
-
-        	$response = $this->request->send();
-
-        	if($response->getStatusCode() == 202) {
-        		return true;
-        	} else {
-        		return false;
-
-        	}
-            // return $response->json();
-
-            // $response_array = $response->json();
-        } catch (Exception $e) {
-        	// Handle??
-           return $e; 
-        }
-    }
-
-    /**
      * GetAsset
      *
      * @param $id Azure Asset Id
@@ -947,6 +887,393 @@ class AzureLive {
            return $e; 
         }
     }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * Locator
+     */
+
+
+    /**
+     * CreateLocator
+     *
+     * @param $name Name
+     */
+    public function createLocator( $accesspolicyid, $assetid, $type ) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Locators');
+
+        $this->setRequestHeaders();
+
+        // dd(date("Y-m-dTH:i:s"));
+
+        $this->request->setBody('
+			{"AccessPolicyId": "'.$accesspolicyid.'", "AssetId" : "'.$assetid.'", "StartTime" : "'.date("Y-m-d\TH:i:s").'", "Type": '.$type.' }
+        ');
+
+        // return dd(date("Y-m-dTH:i:s"));
+
+
+        // {"AccessPolicyId": "nb:pid:UUID:25544a8f-8ccf-43b1-a188-2a860b35bffa", "AssetId" : "nb:cid:UUID:d062e5ef-e496-4f21-87e7-17d210628b7c", "StartTime" : "2014-05-17T16:45:53", "Type":1}
+        //"nb:cid:UUID:bc495364-5357-42a1-9a9d-be54689cfae2"
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        	}
+            return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+
+        // if($response->getStatusCode() == 202) { // Success...
+        	// return $response->json();
+        // } else {
+        // 	return 
+        // }
+    }
+
+    /**
+     * GetLocator
+     *
+     * @param $id Azure Locator Id
+     */
+    public function getLocator($id) {
+
+        $this->request = $this->client->get($this->base_url.'/api/Locators(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * ListLocators
+     */
+    public function listLocators() {
+        $this->request = $this->client->get($this->base_url.'/api/Locators');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    
+    /**
+     * UpdateLocator
+     *
+     * @param $name Name
+     * @param $description Description
+     *
+     * @todo 400 errors atm
+     */
+    public function updateLocator($id, $name = false, $description = false) {
+
+    	// 400 error?
+
+        // $this->request = $this->client->patch($this->base_url.'/api/Locators(\''.$id.'\')');
+
+        // $this->setRequestHeaders();
+
+    //     if($name) {
+	   //      $this->request->setBody('
+				// "Name": "'.$name.'"
+	   //      ');
+    //     }
+
+    //     if($description) {
+	   //      $this->request->setBody('
+				// "Description": "'.$description.'"
+	   //      ');
+	   //  }
+
+        // $this->request->setBody(' "Output":{"Hls":{"FragmentsPerSegment":2}} ');
+
+        // try {
+        //     // $response = $this->request->send();
+
+        // 	$response = $this->request->send();
+
+        // 	if($response->getStatusCode() == 202) {
+        // 	}
+        //     return $response->json();
+
+        //     // $response_array = $response->json();
+        // } catch (Exception $e) {
+        // 	// Handle??
+        //    return $e; 
+        // }
+
+    }
+    
+    /**
+     * DeleteLocator
+     *
+     * @param $id Azure Locator Id
+     */
+    public function deleteLocator($id) {
+        $this->request = $this->client->delete($this->base_url.'/api/Locators(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * AccessPolicie
+     */
+
+
+    /**
+     * CreateAccessPolicy
+     *
+     * @param $name Name
+     * @param $duration Duration
+     * @param $permisions Permisions
+     */
+    public function createAccessPolicy( $name, $duration , $permissions) {
+
+        $this->request = $this->client->post($this->base_url.'/api/AccessPolicies');
+
+        $this->setRequestHeaders();
+
+        $this->request->setBody('
+			{"Name": "'.$name.'", "DurationInMinutes" : "'.$duration.'", "Permissions" : '.$permissions.' }
+        ');
+
+        try {
+            // $response = $this->request->send();
+
+            $response = $this->request->send();
+
+            if($response->getStatusCode() == 202) {
+            }
+            return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+            // Handle??
+           return $e; 
+        }
+
+        // if($response->getStatusCode() == 202) { // Success...
+            // return $response->json();
+        // } else {
+        //  return 
+        // }
+    }
+
+    /**
+     * GetAccessPolicie
+     *
+     * @param $id Azure AccessPolicie Id
+     */
+    public function getAccessPolicy($id) {
+
+        $this->request = $this->client->get($this->base_url.'/api/AccessPolicies(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+            $response = $this->request->send();
+
+            if($response->getStatusCode() == 200) {
+                return $response->json();
+            } else {
+                return false;
+
+            }
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+            // Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * ListAccessPolicies
+     */
+    public function listAccessPolicies() {
+        $this->request = $this->client->get($this->base_url.'/api/AccessPolicies');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+            $response = $this->request->send();
+
+            if($response->getStatusCode() == 200) {
+                return $response->json();
+            } else {
+                return false;
+
+            }
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+            // Handle??
+           return $e; 
+        }
+    }
+
+    
+    /**
+     * UpdateAccessPolicie
+     *
+     * @param $name Name
+     * @param $description Description
+     *
+     * @todo 400 errors atm
+     */
+    public function updateAccessPolicy($id, $name = false, $description = false) {
+
+        // 400 error?
+
+        // $this->request = $this->client->patch($this->base_url.'/api/AccessPolicies(\''.$id.'\')');
+
+        // $this->setRequestHeaders();
+
+    //     if($name) {
+       //      $this->request->setBody('
+                // "Name": "'.$name.'"
+       //      ');
+    //     }
+
+    //     if($description) {
+       //      $this->request->setBody('
+                // "Description": "'.$description.'"
+       //      ');
+       //  }
+
+        // $this->request->setBody(' "Output":{"Hls":{"FragmentsPerSegment":2}} ');
+
+        // try {
+        //     // $response = $this->request->send();
+
+        //  $response = $this->request->send();
+
+        //  if($response->getStatusCode() == 202) {
+        //  }
+        //     return $response->json();
+
+        //     // $response_array = $response->json();
+        // } catch (Exception $e) {
+        //  // Handle??
+        //    return $e; 
+        // }
+
+    }
+    
+    /**
+     * DeleteAccessPolicie
+     *
+     * @param $id Azure AccessPolicie Id
+     */
+    public function deleteAccessPolicy($id) {
+        $this->request = $this->client->delete($this->base_url.'/api/AccessPolicies(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+            $response = $this->request->send();
+
+            if($response->getStatusCode() == 202) {
+                return true;
+            } else {
+                return false;
+
+            }
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+            // Handle??
+           return $e; 
+        }
+    }
+
 
 
 
