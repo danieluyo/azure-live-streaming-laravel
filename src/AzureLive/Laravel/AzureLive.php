@@ -449,10 +449,13 @@ class AzureLive {
     /**
      * CreateProgram
      *
+     * @param $channelid Channel ID
+     * @param $channelid Asset ID
      * @param $name Name
      * @param $description Description
+     * @param $duration Duration  (As ISO8601 http://stackoverflow.com/questions/3721085/parse-and-create-iso-8601-date-and-time-intervals-like-pt15m-in-php)
      */
-    public function createProgram($channelid, $name, $description) {
+    public function createProgram($channelid, $assetid, $name, $description, $duration) {
 
         $this->request = $this->client->post($this->base_url.'/api/Programs');
 
@@ -465,13 +468,15 @@ class AzureLive {
                 "Description": "'.$description.'",
                 "Created": "0001-01-01T00:00:00",
                 "LastModified": "0001-01-01T00:00:00",
-                "ChannelId": "nb:chid:UUID:83bb19de-7abf-4907-9578-abe90adfbabe",
-                "AssetId": "nb:cid:UUID:bc495364-5357-42a1-9a9d-be54689cfae2",
-                "ArchiveWindowLength": "PT1H",
+                "ChannelId": "'.$channelid.'",
+                "AssetId": "'.$assetid.'",
+                "ArchiveWindowLength": "'.$duration.'",
                 "State": null,
                 "ManifestName": null
             }
         ');
+
+        //"nb:cid:UUID:bc495364-5357-42a1-9a9d-be54689cfae2"
 
         try {
             // $response = $this->request->send();
@@ -692,6 +697,261 @@ class AzureLive {
            return $e; 
         }
     }
+
+
+
+
+
+
+
+    /**
+     * Asset
+     */
+
+
+    /**
+     * CreateAsset
+     *
+     * @param $name Name
+     */
+    public function createAsset( $name ) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Assets');
+
+        $this->setRequestHeaders();
+
+        $this->request->setBody('
+            {
+                "Name": "'.$name.'"
+            }
+        ');
+
+        //"nb:cid:UUID:bc495364-5357-42a1-9a9d-be54689cfae2"
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        	}
+            return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+
+        // if($response->getStatusCode() == 202) { // Success...
+        	// return $response->json();
+        // } else {
+        // 	return 
+        // }
+    }
+    
+    /**
+     * StartAsset
+     *
+     * @param $id Azure Asset Id
+     */
+    public function startAsset($id) {
+
+        $this->request = $this->client->post($this->base_url.'/api/Assets(\''.$id.'\')/Start');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * StopAsset
+     *
+     * @param $id Azure Asset Id
+     */
+    public function stopAsset($id) {
+        $this->request = $this->client->post($this->base_url.'/api/Assets(\''.$id.'\')/Stop');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    /**
+     * GetAsset
+     *
+     * @param $id Azure Asset Id
+     */
+    public function getAsset($id) {
+
+        $this->request = $this->client->get($this->base_url.'/api/Assets(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+    
+    /**
+     * ListAssets
+     */
+    public function listAssets() {
+        $this->request = $this->client->get($this->base_url.'/api/Assets');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 200) {
+        		return $response->json();
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+    
+    /**
+     * UpdateAsset
+     *
+     * @param $name Name
+     * @param $description Description
+     *
+     * @todo 400 errors atm
+     */
+    public function updateAsset($id, $name = false, $description = false) {
+
+    	// 400 error?
+
+        // $this->request = $this->client->patch($this->base_url.'/api/Assets(\''.$id.'\')');
+
+        // $this->setRequestHeaders();
+
+    //     if($name) {
+	   //      $this->request->setBody('
+				// "Name": "'.$name.'"
+	   //      ');
+    //     }
+
+    //     if($description) {
+	   //      $this->request->setBody('
+				// "Description": "'.$description.'"
+	   //      ');
+	   //  }
+
+        // $this->request->setBody(' "Output":{"Hls":{"FragmentsPerSegment":2}} ');
+
+        // try {
+        //     // $response = $this->request->send();
+
+        // 	$response = $this->request->send();
+
+        // 	if($response->getStatusCode() == 202) {
+        // 	}
+        //     return $response->json();
+
+        //     // $response_array = $response->json();
+        // } catch (Exception $e) {
+        // 	// Handle??
+        //    return $e; 
+        // }
+
+    }
+    
+    /**
+     * DeleteAsset
+     *
+     * @param $id Azure Asset Id
+     */
+    public function deleteAsset($id) {
+        $this->request = $this->client->delete($this->base_url.'/api/Assets(\''.$id.'\')');
+
+        $this->setRequestHeaders();
+
+        try {
+            // $response = $this->request->send();
+
+        	$response = $this->request->send();
+
+        	if($response->getStatusCode() == 202) {
+        		return true;
+        	} else {
+        		return false;
+
+        	}
+            // return $response->json();
+
+            // $response_array = $response->json();
+        } catch (Exception $e) {
+        	// Handle??
+           return $e; 
+        }
+    }
+
+
+
+
+
 
 
 
